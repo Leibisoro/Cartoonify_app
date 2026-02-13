@@ -3,127 +3,99 @@ import cv2
 import numpy as np
 from PIL import Image
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="Cartoonify", page_icon="✨", layout="wide")
 
 st.markdown("""
-<style>
-body {background-color:#fef7f5;}
+    <style>
+    .main {
+        background-color: #fef7f5;
+    }
+    .stButton>button {
+        background-color: #ffb3d9;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+        padding: 10px 30px;
+        border: none;
+        font-size: 16px;
+    }
+    .stButton>button:hover {
+        background-color: #ff99cc;
+    }
+    h1 {
+        color: #ffb3d9;
+        text-align: center;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    h3 {
+        color: #d4a5c3;
+        text-align: center;
+        font-family: 'Comic Sans MS', cursive;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-.title {
-    text-align:center;
-    font-size:60px;
-    font-weight:bold;
-    color:#ffb3d9;
-    font-family:'Comic Sans MS';
-}
+st.title("✨ Cartoonify ✨")
+st.markdown("### Transform your photos into adorable cartoons")
 
-.subtitle {
-    text-align:center;
-    color:#d4a5c3;
-    font-size:18px;
-    font-family:'Comic Sans MS';
-    margin-bottom:40px;
-}
-
-.left-box {
-    background-color:#fff5f8;
-    border:4px solid #ffc4dd;
-    padding:20px;
-    border-radius:10px;
-}
-
-.right-box {
-    background-color:#f5f8ff;
-    border:4px solid #c4ddff;
-    padding:20px;
-    border-radius:10px;
-}
-
-.section-title-left {
-    text-align:center;
-    color:#ff99cc;
-    font-weight:bold;
-    font-size:20px;
-    font-family:'Comic Sans MS';
-    margin-bottom:15px;
-}
-
-.section-title-right {
-    text-align:center;
-    color:#99ccff;
-    font-weight:bold;
-    font-size:20px;
-    font-family:'Comic Sans MS';
-    margin-bottom:15px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="title">✨ Cartoonify ✨</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Transform your photos into adorable cartoons</div>', unsafe_allow_html=True)
-
-uploaded_file = st.file_uploader("🖼️ UPLOAD IMAGE", type=["jpg","jpeg","png","bmp"])
-
-def cartoonify(image):
-    original = np.array(image)
-
-    # Fix format issues (important for Streamlit Cloud)
-    if original.dtype != np.uint8:
-        original = original.astype(np.uint8)
-
-    if len(original.shape) == 4:
-        original = cv2.cvtColor(original, cv2.COLOR_RGBA2RGB)
-
-    smoothed = original.copy()
+def cartoonify_image(image):
+    img_array = np.array(image)
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    
+    smoothed = img_array.copy()
     for _ in range(2):
         smoothed = cv2.bilateralFilter(smoothed, 9, 75, 75)
-
-    hsv = cv2.cvtColor(smoothed, cv2.COLOR_RGB2HSV).astype(np.float32)
+    
+    hsv = cv2.cvtColor(smoothed, cv2.COLOR_BGR2HSV).astype(np.float32)
     hsv[:, :, 1] = np.clip(hsv[:, :, 1] * 1.5, 0, 255)
     hsv[:, :, 2] = np.clip(hsv[:, :, 2] * 1.2, 0, 255)
     hsv = hsv.astype(np.uint8)
-    vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
-
-    gray = cv2.cvtColor(original, cv2.COLOR_RGB2GRAY)
+    vibrant = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+    
+    gray = cv2.cvtColor(img_array, cv2.COLOR_BGR2GRAY)
     gray_blur = cv2.medianBlur(gray, 7)
-
-    edges = cv2.adaptiveThreshold(
-        gray_blur,
-        255,
-        cv2.ADAPTIVE_THRESH_MEAN_C,
-        cv2.THRESH_BINARY,
-        9,
-        8
-    )
-
-    edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2RGB)
+    edges = cv2.adaptiveThreshold(gray_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 8)
+    edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
     cartoon = cv2.bitwise_and(vibrant, edges_colored)
+    
+    cartoon_rgb = cv2.cvtColor(cartoon, cv2.COLOR_BGR2RGB)
+    return Image.fromarray(cartoon_rgb)
 
-    return cartoon
+st.markdown("---")
 
-if uploaded_file:
-    image = Image.open(uploaded_file)
-    cartoon_img = cartoonify(image)
+uploaded_file = st.file_uploader("🖼️ Upload an image", type=["jpg", "jpeg", "png", "bmp"])
 
+if uploaded_file is not None:
+    original_image = Image.open(uploaded_file)
+    
+    with st.spinner("✨ Creating magic..."):
+        cartoon_image = cartoonify_image(original_image)
+    
     col1, col2 = st.columns(2)
-
+    
     with col1:
-        st.markdown('<div class="left-box">', unsafe_allow_html=True)
-        st.markdown('<div class="section-title-left">💫 ORIGINAL 💫</div>', unsafe_allow_html=True)
-        st.image(image, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
+        st.markdown("### 💫 ORIGINAL")
+        st.image(original_image, use_container_width=True)
+    
     with col2:
-        st.markdown('<div class="right-box">', unsafe_allow_html=True)
-        st.markdown('<div class="section-title-right">🎨 CARTOON 🎨</div>', unsafe_allow_html=True)
-        st.image(cartoon_img, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
+        st.markdown("### 🎨 CARTOON")
+        st.image(cartoon_image, use_container_width=True)
+    
+    st.markdown("---")
+    
+    from io import BytesIO
+    buf = BytesIO()
+    cartoon_image.save(buf, format="PNG")
+    byte_im = buf.getvalue()
+    
     st.download_button(
-        "💾 SAVE CARTOON",
-        data=cv2.imencode(".png", cv2.cvtColor(cartoon_img, cv2.COLOR_RGB2BGR))[1].tobytes(),
+        label="💾 Download Cartoon Image",
+        data=byte_im,
         file_name="cartoon.png",
         mime="image/png"
     )
+    
+    st.success("💖 Ta-da! Your cartoon is ready!")
+else:
+    st.info("👆 Upload an image to get started!")
+    
