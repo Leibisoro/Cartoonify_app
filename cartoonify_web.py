@@ -20,25 +20,35 @@ st.markdown("""
     
     [data-testid="stHeader"] {
         background-color: #fef7f5 !important;
+        height: 0px !important;
     }
     
     .main {
         background-color: #fef7f5 !important;
+        padding-top: 0rem !important;
+    }
+    
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+        max-width: 95% !important;
     }
     
     /* Hide menu and footer */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    header {visibility: hidden;}
     
     /* Title styling - exact match */
     h1 {
         color: #ffb3d9 !important;
         text-align: center;
         font-family: 'Comic Sans MS', cursive, sans-serif !important;
-        font-size: 48px !important;
-        font-weight: bold !important;
-        margin-bottom: 5px !important;
-        padding-top: 30px;
+        font-size: 3rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.2rem !important;
+        margin-top: 1rem !important;
+        padding: 0 !important;
     }
     
     /* Subtitle styling - exact match */
@@ -46,9 +56,9 @@ st.markdown("""
         color: #d4a5c3 !important;
         text-align: center;
         font-family: 'Comic Sans MS', cursive, sans-serif !important;
-        font-size: 14px !important;
+        font-size: 1rem !important;
         margin-top: 0px !important;
-        margin-bottom: 30px !important;
+        margin-bottom: 2rem !important;
     }
     
     /* Column headers - exact match */
@@ -85,7 +95,7 @@ st.markdown("""
         border-top: none;
         border-radius: 0 0 10px 10px;
         padding: 20px;
-        min-height: 400px;
+        min-height: 500px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -97,10 +107,17 @@ st.markdown("""
         border-top: none;
         border-radius: 0 0 10px 10px;
         padding: 20px;
-        min-height: 400px;
+        min-height: 500px;
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    
+    /* Make images fit properly */
+    .image-container-left img, .image-container-right img {
+        max-height: 460px !important;
+        width: auto !important;
+        object-fit: contain !important;
     }
     
     /* Upload button styling - exact match */
