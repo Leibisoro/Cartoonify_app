@@ -66,6 +66,14 @@ uploaded_file = st.file_uploader("🖼️ UPLOAD IMAGE", type=["jpg","jpeg","png
 
 def cartoonify(image):
     original = np.array(image)
+
+    # Fix format issues (important for Streamlit Cloud)
+    if original.dtype != np.uint8:
+        original = original.astype(np.uint8)
+
+    if len(original.shape) == 4:
+        original = cv2.cvtColor(original, cv2.COLOR_RGBA2RGB)
+
     smoothed = original.copy()
     for _ in range(2):
         smoothed = cv2.bilateralFilter(smoothed, 9, 75, 75)
@@ -80,9 +88,13 @@ def cartoonify(image):
     gray_blur = cv2.medianBlur(gray, 7)
 
     edges = cv2.adaptiveThreshold(
-        gray_blur,255,
+        gray_blur,
+        255,
         cv2.ADAPTIVE_THRESH_MEAN_C,
-        cv2.THRESH_BINARY,9,8)
+        cv2.THRESH_BINARY,
+        9,
+        8
+    )
 
     edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2RGB)
     cartoon = cv2.bitwise_and(vibrant, edges_colored)
