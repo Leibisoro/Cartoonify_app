@@ -8,30 +8,51 @@ st.set_page_config(page_title="Cartoonify", page_icon="✨", layout="wide")
 st.markdown("""
     <style>
     .main {
-        background-color: #fef7f5;
+        background-color: #fdf2f8;
     }
+
+    h1 {
+        color: #ff8fcf;
+        text-align: center;
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 70px;
+    }
+
+    h3 {
+        color: #cba6f7;
+        text-align: center;
+        font-family: 'Comic Sans MS', cursive;
+        font-size: 28px;
+    }
+
     .stButton>button {
         background-color: #ffb3d9;
         color: white;
         font-weight: bold;
-        border-radius: 10px;
-        padding: 10px 30px;
+        border-radius: 15px;
+        padding: 12px 35px;
         border: none;
-        font-size: 16px;
+        font-size: 18px;
     }
+
     .stButton>button:hover {
         background-color: #ff99cc;
     }
-    h1 {
-        color: #ffb3d9;
-        text-align: center;
-        font-family: 'Comic Sans MS', cursive;
+
+    .image-box-left {
+        background-color: #fff0f6;
+        padding: 20px;
+        border-radius: 20px;
+        border: 4px solid #ffc2e2;
     }
-    h3 {
-        color: #d4a5c3;
-        text-align: center;
-        font-family: 'Comic Sans MS', cursive;
+
+    .image-box-right {
+        background-color: #eef4ff;
+        padding: 20px;
+        border-radius: 20px;
+        border: 4px solid #c2d8ff;
     }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -54,7 +75,12 @@ def cartoonify_image(image):
     
     gray = cv2.cvtColor(img_array, cv2.COLOR_BGR2GRAY)
     gray_blur = cv2.medianBlur(gray, 7)
-    edges = cv2.adaptiveThreshold(gray_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 8)
+    edges = cv2.adaptiveThreshold(
+        gray_blur, 255,
+        cv2.ADAPTIVE_THRESH_MEAN_C,
+        cv2.THRESH_BINARY,
+        9, 8
+    )
     edges_colored = cv2.cvtColor(edges, cv2.COLOR_GRAY2BGR)
     cartoon = cv2.bitwise_and(vibrant, edges_colored)
     
@@ -74,12 +100,16 @@ if uploaded_file is not None:
     col1, col2 = st.columns(2)
     
     with col1:
+        st.markdown('<div class="image-box-left">', unsafe_allow_html=True)
         st.markdown("### 💫 ORIGINAL")
-        st.image(original_image, use_container_width=True)
+        st.image(original_image, width=450)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
+        st.markdown('<div class="image-box-right">', unsafe_allow_html=True)
         st.markdown("### 🎨 CARTOON")
-        st.image(cartoon_image, use_container_width=True)
+        st.image(cartoon_image, width=450)
+        st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -98,4 +128,4 @@ if uploaded_file is not None:
     st.success("💖 Ta-da! Your cartoon is ready!")
 else:
     st.info("👆 Upload an image to get started!")
-    
+
