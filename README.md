@@ -67,7 +67,7 @@ The cartoonification process uses several OpenCV techniques:
 
 ## 📱 Live Demo
 
-Try it online: [Add your deployed link here]
+Try it online: https://cartoonifyapp.streamlit.app/
 
 ## 🖼️ Screenshots
 
@@ -90,7 +90,7 @@ This project is open source and available under the MIT License.
 
 ## 👨‍💻 Author
 
-Created with 💖 by [Your Name]
+Created with 💖 by Leibi
 
 ## 🙏 Acknowledgments
 
